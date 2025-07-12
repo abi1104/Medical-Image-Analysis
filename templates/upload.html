@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Medical Image</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .top-banner {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .bottom-banner {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+ 
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .button-group button {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 150px;
+        }
+
+        .button-group button:hover {
+            background-color: #0056b3;
+        }
+
+     
+        .file-input-container {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+  
+        .custom-file-input {
+            display: none;
+        }
+
+        .file-label {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 30%;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .file-label:hover {
+            background-color: #218838;
+        }
+
+        input[type="file"]:focus {
+            outline: none;
+        }
+
+     
+        .image-preview {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 10px;
+        }
+
+    
+        .file-name {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+    
+        .predict-button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 10%;
+            transition: background-color 0.3s ease;
+        }
+
+        .predict-button:hover {
+            background-color: #218838;
+        }
+
+        .predict-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .result {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+ 
+    <div class="top-banner">
+        Upload Medical Image for Prediction
+    </div>
+
+    <div>
+    
+        <div class="button-group">
+            <button onclick="showFileInput('mri')">Upload MRI</button>
+            <button onclick="showFileInput('ct')">Upload CT</button> 
+            <button onclick="showFileInput('xray')">Upload X-ray</button>
+        </div>
+
+     
+        <div id="mri" class="file-input-container">
+            <form id="mri-form" action="/predict" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="image_type" value="mri">
+                <label class="file-label" for="mri-file">Choose MRI Image</label>
+                <input type="file" id="mri-file" class="custom-file-input" name="file" accept="image/*" onchange="previewImage(event, 'mri')">
+                <br><br>
+                <img id="mri-preview" class="image-preview" style="display:none;" alt="MRI Preview" />
+                <div id="mri-file-name" class="file-name"></div>
+                <br>
+                <button type="button" class="predict-button" onclick="predict('mri')">Predict</button>
+            </form>
+            <div id="mri-result" class="result"></div>
+        </div>
+
+      
+        <div id="ct" class="file-input-container">
+            <form id="ct-form" action="/predict" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="image_type" value="ct">
+                <label class="file-label" for="ct-file">Choose CT Image</label>
+                <input type="file" id="ct-file" class="custom-file-input" name="file" accept="image/*" onchange="previewImage(event, 'ct')">
+                <br><br>
+                <img id="ct-preview" class="image-preview" style="display:none;" alt="CT Preview" />
+                <div id="ct-file-name" class="file-name"></div>
+                <br>
+                <button type="button" class="predict-button" onclick="predict('ct')">Predict</button>
+            </form>
+            <div id="ct-result" class="result"></div>
+        </div>
+    
+
+        <div id="xray" class="file-input-container">
+            <form id="xray-form" action="/predict" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="image_type" value="xray">
+                <label class="file-label" for="xray-file">Choose X-ray Image</label>
+                <input type="file" id="xray-file" class="custom-file-input" name="file" accept="image/*" onchange="previewImage(event, 'xray')">
+                <br><br>
+                <img id="xray-preview" class="image-preview" style="display:none;" alt="X-ray Preview" />
+                <div id="xray-file-name" class="file-name"></div>
+                <br>
+                <button type="button" class="predict-button" onclick="predict('xray')">Predict</button>
+            </form>
+            <div id="xray-result" class="result"></div>
+        </div>
+    </div>
+
+   
+    <div class="bottom-banner">
+        © 2025 Your Company. All Rights Reserved.
+    </div>
+
+    <script>
+    
+        function showFileInput(scanType) {
+            document.querySelectorAll('.file-input-container').forEach(function(container) {
+                container.style.display = 'none';
+            });
+            document.querySelectorAll('.result').forEach(function(res) {
+                res.textContent = '';
+            });
+            document.getElementById(scanType).style.display = 'block';
+        }
+    
+
+        function previewImage(event, scanType) {
+            const preview = document.getElementById(scanType + '-preview');
+            const fileNameDisplay = document.getElementById(scanType + '-file-name');
+    
+            if (event.target.files.length > 0) {
+                preview.style.display = 'block';
+                preview.src = URL.createObjectURL(event.target.files[0]);
+                fileNameDisplay.textContent = 'File selected: ' + event.target.files[0].name;
+            } else {
+                preview.style.display = 'none';
+                preview.src = '';
+                fileNameDisplay.textContent = '';
+            }
+        }
+    
+        async function predict(scanType) {
+            const fileInput = document.getElementById(scanType + '-file');
+            const resultDiv = document.getElementById(scanType + '-result');
+    
+            if (!fileInput.files.length) {
+                alert("Please upload an image before predicting.");
+                return;
+            }
+    
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('image_type', scanType);
+    
+            resultDiv.textContent = "Predicting... Please wait!";
+    
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Server error!');
+                }
+    
+                const data = await response.json();
+                resultDiv.textContent = 'Prediction Result: ' + data.prediction;
+            } catch (error) {
+                console.error(error);
+                resultDiv.textContent = 'Error occurred while predicting.';
+            }
+        }
+    </script>
+    
+
+</body>
+</html>
